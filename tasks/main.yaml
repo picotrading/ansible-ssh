@@ -1,0 +1,25 @@
+---
+
+- name: SSH client configuration
+  template:
+    src: ssh_config.j2
+    dest: /etc/ssh/ssh_config
+
+- name: SSH daemon configuration
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+  notify:
+    - Restart SSH daemon
+
+- name: Set SSH banner
+  template:
+    src: banner.j2
+    dest: "{{ ssh_banner_location }}"
+  when: ssh_banner is defined
+
+- name: Start SSH services
+  service:
+    name: sshd
+    enabled: yes
+    state: started
