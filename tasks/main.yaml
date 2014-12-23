@@ -1,5 +1,29 @@
 ---
 
+- name: Test distribution
+  assert:
+    that: >
+      ansible_os_family == "RedHat" or
+      ansible_os_family == "Debian"
+
+- name: Install ssh for Debian
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openssh-server
+    - openssh-client
+  when: ansible_os_family == "Debian"
+
+- name: Install ssh for RedHat
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openssh-server
+    - openssh-clients
+  when: ansible_os_family == "RedHat"
+
 - name: SSH client configuration
   template:
     src: ssh_config.j2
