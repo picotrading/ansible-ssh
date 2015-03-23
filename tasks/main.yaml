@@ -13,7 +13,11 @@
   with_items:
     - openssh-server
     - openssh-client
+  notify:
+    - Restart SSH daemon
   when: ansible_os_family == "Debian"
+  tags:
+    - ssh_pkg
 
 - name: Install ssh for RedHat
   yum:
@@ -22,12 +26,18 @@
   with_items:
     - openssh-server
     - openssh-clients
+  notify:
+    - Restart SSH daemon
   when: ansible_os_family == "RedHat"
+  tags:
+    - ssh_pkg
 
 - name: SSH client configuration
   template:
     src: ssh_config.j2
     dest: /etc/ssh/ssh_config
+  tags:
+    - ssh_config
 
 - name: SSH daemon configuration
   template:
@@ -35,12 +45,16 @@
     dest: /etc/ssh/sshd_config
   notify:
     - Restart SSH daemon
+  tags:
+    - ssh_config
 
 - name: Set SSH banner
   template:
     src: banner.j2
     dest: "{{ ssh_banner_location }}"
   when: ssh_banner is defined
+  tags:
+    - ssh_config
 
 - name: Start SSH services
   service:
